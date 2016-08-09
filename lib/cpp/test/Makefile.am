@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	TPipedTransportTest \
 	DebugProtoTest \
 	JSONProtoTest \
+	JSONRPCProtoTest \
 	OptionalRequiredTest \
 	RecursiveTest \
 	SpecializationTest \
@@ -246,6 +247,18 @@ JSONProtoTest_SOURCES = \
 	JSONProtoTest.cpp
 
 JSONProtoTest_LDADD = \
+	libtestgencpp.la \
+	$(BOOST_TEST_LDADD)
+
+#
+# JSONRPCProtoTest
+#
+JSONRPCProtoTest_SOURCES = \
+	gen-cpp/Srv.h \
+	gen-cpp/Srv.cpp \
+	JSONRPCProtoTest.cpp
+
+JSONRPCProtoTest_LDADD = \
 	libtestgencpp.la \
 	$(BOOST_TEST_LDADD)
 

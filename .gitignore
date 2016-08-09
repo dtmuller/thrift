@@ -102,6 +102,7 @@ erl_crash.dump
 /lib/cpp/test/DenseProtoTest
 /lib/cpp/test/EnumTest
 /lib/cpp/test/JSONProtoTest
+/lib/cpp/test/JSONRPCProtoTest
 /lib/cpp/test/OptionalRequiredTest
 /lib/cpp/test/SecurityTest
 /lib/cpp/test/SpecializationTest
