@@ -37,6 +37,8 @@ set( thriftcpp_SOURCES
    src/thrift/protocol/TBase64Utils.cpp
    src/thrift/protocol/TDebugProtocol.cpp
    src/thrift/protocol/TJSONProtocol.cpp
+   src/thrift/protocol/TJSONRPCProtocol.cpp
+   src/thrift/protocol/TJSONUtils.cpp
    src/thrift/protocol/TMultiplexedProtocol.cpp
    src/thrift/protocol/TProtocol.cpp
    src/thrift/transport/TTransportException.cpp

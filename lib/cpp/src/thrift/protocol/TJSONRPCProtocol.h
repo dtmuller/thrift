@@ -17,11 +17,11 @@
  * under the License.
  */
 
-#ifndef _THRIFT_PROTOCOL_TJSONPROTOCOL_H_
-#define _THRIFT_PROTOCOL_TJSONPROTOCOL_H_ 1
+#ifndef _THRIFT_PROTOCOL_TJSONRPCPROTOCOL_H_
+#define _THRIFT_PROTOCOL_TJSONRPCPROTOCOL_H_ 1
 
-#include <thrift/protocol/TVirtualProtocol.h>
 #include <thrift/protocol/TJSONUtils.h>
+#include <thrift/protocol/TVirtualProtocol.h>
 #include <thrift/transport/TBufferTransports.h>
 
 namespace apache {
@@ -92,12 +92,13 @@ class TJSONContextStack;
  * bind to the same underlying implementation for maximum consistency.
  *
  */
+class TJSONRPCProtocol : public TVirtualProtocol<TJSONRPCProtocol> {
+  friend class TJSONRPCMessage;
 
-class TJSONProtocol : public TVirtualProtocol<TJSONProtocol> {
 public:
-  TJSONProtocol(boost::shared_ptr<TTransport> ptrans);
+  TJSONRPCProtocol(boost::shared_ptr<TTransport> ptrans);
 
-  virtual ~TJSONProtocol();
+  ~TJSONRPCProtocol();
 
 public:
   /**
@@ -179,7 +180,7 @@ public:
   uint32_t readBool(bool& value);
 
   // Provide the default readBool() implementation for std::vector<bool>
-  using TVirtualProtocol<TJSONProtocol>::readBool;
+  using TVirtualProtocol<TJSONRPCProtocol>::readBool;
 
   uint32_t readByte(int8_t& byte);
 
@@ -195,61 +196,87 @@ public:
 
   uint32_t readBinary(std::string& str);
 
-  uint32_t readObject(transport::TMemoryBuffer& buf);
+private:
+  uint32_t readJSONRPCField();
+
+public:
+  struct JSONRPCMessage {
+    std::string method;
+    int32_t id;
+    int32_t error_code;
+    std::string error_message;
+  };
+
+  enum JSONRPCFlags {
+    JSONRPC_UNSET     = 0,
+    JSONRPC_VERSION   = 1 << 0,
+    JSONRPC_METHOD    = 1 << 1,
+    JSONRPC_ID        = 1 << 2,
+    JSONRPC_PARAMS    = 1 << 3,
+    JSONRPC_RESULT    = 1 << 4,
+    JSONRPC_ERR_CODE  = 1 << 5,
+    JSONRPC_ERR_MSG   = 1 << 6,
+    JSONRPC_ERR_DATA  = 1 << 7,
+    JSONRPC_REQUEST           = JSONRPC_VERSION | JSONRPC_ID | JSONRPC_METHOD,
+    JSONRPC_FULL_REQUEST      = JSONRPC_REQUEST | JSONRPC_PARAMS,
+    JSONRPC_NOTIFICATION      = JSONRPC_VERSION | JSONRPC_METHOD,
+    JSONRPC_FULL_NOTIFICATION = JSONRPC_NOTIFICATION | JSONRPC_PARAMS,
+    JSONRPC_RESPONSE          = JSONRPC_VERSION | JSONRPC_ID | JSONRPC_RESULT,
+    JSONRPC_ERROR             = JSONRPC_VERSION | JSONRPC_ID | JSONRPC_ERR_CODE | JSONRPC_ERR_MSG,
+    JSONRPC_FULL_ERROR        = JSONRPC_ERROR | JSONRPC_ERR_DATA,
+  };
 
 private:
+  enum RWMode {
+    RW_TRANSPORT,
+    RW_BUFFERED,
+    _RW_MAX
+  };
+
+  inline TJSONContextStack& contexts() {
+    return (mode_ == RW_TRANSPORT) ? transport_contexts_ : buffer_contexts_;
+  }
+
   inline boost::shared_ptr<TJSONContext> context() {
-    return contexts_.top();
+    return contexts().top();
+  }
+
+  inline boost::shared_ptr<TTransport> transport() {
+    return contexts().top()->transport();
   }
 
 private:
-  TTransport* trans_;
+  RWMode mode_;
 
-  TJSONContextStack contexts_;
+  JSONRPCMessage message_;
+  JSONRPCFlags flags_;
+
+  boost::shared_ptr<TMemoryBuffer> buffer_;
+
+  TJSONContextStack transport_contexts_;
+  TJSONContextStack buffer_contexts_;
 };
+
+TJSONRPCProtocol::JSONRPCFlags operator| (TJSONRPCProtocol::JSONRPCFlags lhs,
+                                         TJSONRPCProtocol::JSONRPCFlags rhs) {
+  return static_cast<TJSONRPCProtocol::JSONRPCFlags>(static_cast<int32_t>(lhs) | static_cast<int32_t>(rhs));
+}
 
 /**
  * Constructs input and output protocol objects given transports.
  */
-class TJSONProtocolFactory : public TProtocolFactory {
+class TJSONRPCProtocolFactory : public TProtocolFactory {
 public:
-  TJSONProtocolFactory() {}
+  TJSONRPCProtocolFactory() {}
 
-  virtual ~TJSONProtocolFactory() {}
+  virtual ~TJSONRPCProtocolFactory() {}
 
   boost::shared_ptr<TProtocol> getProtocol(boost::shared_ptr<TTransport> trans) {
-    return boost::shared_ptr<TProtocol>(new TJSONProtocol(trans));
+    return boost::shared_ptr<TProtocol>(new TJSONRPCProtocol(trans));
   }
 };
 
 }
 }
 } // apache::thrift::protocol
-
-
-
-// TODO(dreiss): Move part of ThriftJSONString into a .cpp file and remove this.
-#include <thrift/transport/TBufferTransports.h>
-
-namespace apache {
-namespace thrift {
-
-template <typename ThriftStruct>
-std::string ThriftJSONString(const ThriftStruct& ts) {
-  using namespace apache::thrift::transport;
-  using namespace apache::thrift::protocol;
-  TMemoryBuffer* buffer = new TMemoryBuffer;
-  boost::shared_ptr<TTransport> trans(buffer);
-  TJSONProtocol protocol(trans);
-
-  ts.write(&protocol);
-
-  uint8_t* buf;
-  uint32_t size;
-  buffer->getBuffer(&buf, &size);
-  return std::string((char*)buf, (unsigned int)size);
-}
-}
-} // apache::thrift
-
-#endif // #define _THRIFT_PROTOCOL_TJSONPROTOCOL_H_ 1
+#endif // #define _THRIFT_PROTOCOL_TJSONRPCPROTOCOL_H_ 1

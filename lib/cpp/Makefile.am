@@ -77,6 +77,8 @@ libthrift_la_SOURCES = src/thrift/TApplicationException.cpp \
                        src/thrift/processor/PeekProcessor.cpp \
                        src/thrift/protocol/TDebugProtocol.cpp \
                        src/thrift/protocol/TJSONProtocol.cpp \
+                       src/thrift/protocol/TJSONRPCProtocol.cpp \
+                       src/thrift/protocol/TJSONUtils.cpp \
                        src/thrift/protocol/TBase64Utils.cpp \
                        src/thrift/protocol/TMultiplexedProtocol.cpp \
                        src/thrift/protocol/TProtocol.cpp \
@@ -120,7 +122,7 @@ libthriftnb_la_SOURCES = src/thrift/server/TNonblockingServer.cpp \
 
 libthriftz_la_SOURCES = src/thrift/transport/TZlibTransport.cpp \
                         src/thrift/transport/THeaderTransport.cpp \
-                        src/thrift/protocol/THeaderProtocol.cpp 
+                        src/thrift/protocol/THeaderProtocol.cpp
 
 
 libthriftqt_la_MOC = src/thrift/qt/moc_TQTcpServer.cpp
@@ -194,6 +196,8 @@ include_protocol_HEADERS = \
                          src/thrift/protocol/THeaderProtocol.h \
                          src/thrift/protocol/TBase64Utils.h \
                          src/thrift/protocol/TJSONProtocol.h \
+                         src/thrift/protocol/TJSONRPCProtocol.h \
+                         src/thrift/protocol/TJSONUtils.h \
                          src/thrift/protocol/TMultiplexedProtocol.h \
                          src/thrift/protocol/TProtocolDecorator.h \
                          src/thrift/protocol/TProtocolTap.h \

@@ -48,6 +48,8 @@
     <ClCompile Include="src\thrift\protocol\TBase64Utils.cpp" />
     <ClCompile Include="src\thrift\protocol\TDebugProtocol.cpp"/>
     <ClCompile Include="src\thrift\protocol\TJSONProtocol.cpp"/>
+    <ClCompile Include="src\thrift\protocol\TJSONRPCProtocol.cpp"/>
+    <ClCompile Include="src\thrift\protocol\TJSONUtils.cpp"/>
     <ClCompile Include="src\thrift\protocol\TProtocol.cpp"/>
     <ClCompile Include="src\thrift\protocol\TMultiplexedProtocol.cpp"/>
     <ClCompile Include="src\thrift\server\TSimpleServer.cpp"/>
@@ -87,6 +89,8 @@
     <ClInclude Include="src\thrift\protocol\TBinaryProtocol.h" />
     <ClInclude Include="src\thrift\protocol\TDebugProtocol.h" />
     <ClInclude Include="src\thrift\protocol\TJSONProtocol.h" />
+    <ClInclude Include="src\thrift\protocol\TJSONRPCProtocol.h" />
+    <ClInclude Include="src\thrift\protocol\TJSONUtils.h" />
     <ClInclude Include="src\thrift\protocol\TMultiplexedProtocol.h" />
     <ClInclude Include="src\thrift\protocol\TProtocol.h" />
     <ClInclude Include="src\thrift\protocol\TVirtualProtocol.h" />
